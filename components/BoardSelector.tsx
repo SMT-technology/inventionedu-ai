@@ -44,8 +44,8 @@ export default function BoardSelector({
           return (
             <div
               key={profile.boardId}
-              className={`flex flex-col justify-between rounded-[2rem] border-2 p-6 shadow-lg shadow-sky-900/5 transition ${
-                selected ? "border-indigo-400 bg-indigo-50/90" : "border-white bg-white/90 hover:border-sky-200"
+              className={`flex flex-col justify-between rounded-3xl border-2 p-6 shadow-lg shadow-sky-900/5 transition ${
+                selected ? "border-sky-400 bg-sky-50" : "border-sky-100 bg-white hover:border-sky-200"
               }`}
             >
               <div>
@@ -66,7 +66,7 @@ export default function BoardSelector({
                 disabled={submittingId !== null}
                 className={`mt-5 px-4 py-2.5 text-sm font-bold shadow-sm disabled:opacity-50 ${
                   selected
-                    ? "bg-gradient-to-r from-sky-500 to-indigo-600 text-white"
+                    ? "bg-sky-600 text-white"
                     : "border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100"
                 }`}
               >

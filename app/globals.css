@@ -39,12 +39,20 @@
 
 @layer utilities {
   .maker-panel {
-    @apply border border-white/80 bg-white/85 shadow-xl shadow-sky-900/5 backdrop-blur-sm;
+    @apply border border-sky-100/80 bg-white/90 shadow-xl shadow-sky-900/5 backdrop-blur-sm;
   }
 
   .dot-grid {
-    background-image: radial-gradient(rgb(14 165 233 / 0.16) 1px, transparent 1px);
-    background-size: 18px 18px;
+    background-image: radial-gradient(rgb(14 165 233 / 0.12) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  .idea-card {
+    @apply rounded-3xl border border-sky-100 bg-white shadow-lg shadow-sky-900/5;
+  }
+
+  .section-kicker {
+    @apply text-xs font-black uppercase tracking-[0.18em] text-sky-700;
   }
 
   .animate-float {

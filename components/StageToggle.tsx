@@ -49,7 +49,7 @@ export default function StageToggle({
     <button
       onClick={handleClick}
       disabled={saving}
-      className={`px-4 py-2 text-sm font-bold shadow-sm transition disabled:opacity-50 ${STYLE[status]}`}
+      className={`px-4 py-2.5 text-sm font-bold shadow-sm transition disabled:opacity-50 ${STYLE[status]}`}
     >
       {LABEL[status]} · 클릭하여 변경
     </button>

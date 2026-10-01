@@ -41,34 +41,34 @@ export default function SubmissionBoard({
   }
 
   return (
-    <div className="mt-7 flex flex-col gap-5">
+    <div className="mt-8 flex flex-col gap-6">
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-3 rounded-2xl border border-sky-100 bg-gradient-to-br from-sky-50/90 to-indigo-50/80 p-4 sm:p-5"
+        className="flex flex-col gap-3 rounded-3xl border border-sky-100 bg-gradient-to-br from-sky-50/90 to-amber-50/70 p-5 sm:p-6"
       >
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder={titlePlaceholder ?? `${entryLabel} 제목`}
-          className="rounded-xl border border-white bg-white/90 px-4 py-3 text-sm shadow-sm"
+          className="rounded-2xl border border-sky-100 bg-white px-4 py-3 text-sm shadow-sm"
         />
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder={contentPlaceholder ?? `${entryLabel} 내용을 적어보세요`}
           rows={3}
-          className="rounded-xl border border-white bg-white/90 px-4 py-3 text-sm shadow-sm"
+          className="rounded-2xl border border-sky-100 bg-white px-4 py-3 text-sm shadow-sm"
         />
         <input
           value={imageUrl}
           onChange={(e) => setImageUrl(e.target.value)}
           placeholder="사진 URL (선택)"
-          className="rounded-xl border border-white bg-white/90 px-4 py-3 text-sm shadow-sm"
+          className="rounded-2xl border border-sky-100 bg-white px-4 py-3 text-sm shadow-sm"
         />
         <button
           type="submit"
           disabled={submitting || !title.trim() || !content.trim()}
-          className="self-start bg-gradient-to-r from-sky-500 to-indigo-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-sky-200 disabled:opacity-50"
+          className="self-start bg-sky-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-sky-200 hover:bg-sky-700 disabled:opacity-50"
         >
           {submitting ? "저장 중..." : `✨ ${entryLabel} 추가하기`}
         </button>
@@ -85,7 +85,7 @@ export default function SubmissionBoard({
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
           {submissions.map((s) => (
-            <li key={s.id} className="rounded-2xl border border-white bg-white/90 p-5 shadow-lg shadow-sky-900/5">
+            <li key={s.id} className="idea-card p-5">
               <div className="flex items-start justify-between gap-2">
                 <h3 className="font-semibold">{s.title}</h3>
                 <button
