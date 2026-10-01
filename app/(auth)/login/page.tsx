@@ -8,7 +8,7 @@ type DemoUser = {
   name: string;
   email: string;
   role: string;
-  boardType: string | null;
+  class: { name: string } | null;
 };
 
 export default function LoginPage() {
@@ -51,9 +51,9 @@ export default function LoginPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-7 px-4 py-12 sm:px-6">
       <div className="text-center">
-        <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-[1.75rem] border-4 border-white bg-gradient-to-br from-sky-400 to-indigo-500 text-4xl shadow-xl shadow-sky-200" aria-hidden="true">🤖</div>
-        <span className="inline-flex rounded-full bg-sky-100 px-3 py-1 text-xs font-bold tracking-widest text-sky-700">ROBOT MAKER LAB</span>
-        <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">로봇 교육 웹앱</h1>
+        <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-[1.75rem] border-4 border-white bg-gradient-to-br from-sky-400 to-indigo-500 text-4xl shadow-xl shadow-sky-200" aria-hidden="true">💡</div>
+        <span className="inline-flex rounded-full bg-sky-100 px-3 py-1 text-xs font-bold tracking-widest text-sky-700">INVENTION MAKER LAB</span>
+        <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">발명 메이커 랩</h1>
         <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-500">
           지금은 실제 인증 없이, 아래 데모 계정 중 하나를 선택해 로그인합니다.
         </p>
@@ -93,9 +93,9 @@ export default function LoginPage() {
                   disabled={loggingInId !== null}
                   className="group border border-sky-100 bg-white px-4 py-3 text-left text-sm shadow-sm hover:border-sky-300 hover:bg-sky-50 disabled:opacity-50"
                 >
-                  <div className="font-bold text-slate-800 group-hover:text-sky-700">🔧 {s.name}</div>
+                  <div className="font-bold text-slate-800 group-hover:text-sky-700">🙋 {s.name}</div>
                   <div className="mt-1 text-xs text-slate-500">
-                    {s.boardType ? `보드: ${s.boardType}` : "보드 미선택"}
+                    {s.class?.name ?? "반 미배정"}
                   </div>
                 </button>
               ))}

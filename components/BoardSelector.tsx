@@ -25,8 +25,8 @@ export default function BoardSelector({
         body: JSON.stringify({ boardType: boardId }),
       });
       if (!res.ok) throw new Error("failed");
-      router.push("/stage1-hw");
       router.refresh();
+      setSubmittingId(null);
     } catch {
       setError("보드 선택에 실패했습니다. 다시 시도해주세요.");
       setSubmittingId(null);
@@ -49,7 +49,7 @@ export default function BoardSelector({
               }`}
             >
               <div>
-                <div className="mb-4 text-4xl" aria-hidden="true">{profile.boardId.includes("micro") ? "🤖" : "🦾"}</div>
+                <div className="mb-4 text-4xl" aria-hidden="true">🔌</div>
                 <h3 className="text-xl font-black text-slate-900">{profile.displayName}</h3>
                 <p className="mt-2 inline-flex rounded-full bg-sky-100 px-2.5 py-1 text-xs font-bold text-sky-700">
                   코드 언어: {profile.codeTemplate.language}

@@ -1,4 +1,4 @@
-// Prisma schema for the Robot Edu App
+// Prisma schema for the 발명 메이커 랩 (invention education) app
 // Note: enum-like fields are typed as String (documented via comments below)
 // so the same schema stays portable if the DB provider ever changes again.
 
@@ -13,7 +13,7 @@ generator client {
 }
 
 /// role: "teacher" | "student"
-/// boardType: "arduino" | "microbit" | null
+/// boardType: "arduino" | "microbit" | null — 5단계(실행하기)에서만 선택
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -39,7 +39,7 @@ model Class {
   students User[]
 }
 
-/// stage: 1 | 2 | 3 | 4
+/// stage: 1~6 (발명 문제해결 6단계, lib/stages.ts)
 /// status: "not_started" | "in_progress" | "done"
 model Progress {
   id        String   @id @default(cuid())
@@ -53,8 +53,8 @@ model Progress {
   @@unique([userId, stage])
 }
 
-/// stage: 1 (Tinkering/아이디어 보드) | 2 (Making/메이킹 일지) | 3 (Sharing) | 4 (Improving)
-/// One row = one idea-board card or one journal entry; a user can have many per stage.
+/// stage: 1~6 (lib/stages.ts)
+/// One row = one record card in a stage (발견한 문제, 아이디어, 제작 기록 등); many per stage.
 model Submission {
   id        String   @id @default(cuid())
   userId    String

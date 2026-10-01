@@ -2,20 +2,27 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const STUDENT_NAMES = [
-  "김민준", "이서연", "박도윤", "최지우", "정하은",
-  "강시우", "조은우", "윤서아", "장하윤", "임지호",
-  "한소율", "오준서", "서예은", "신도현", "권나은",
-  "황건우", "안수아", "송민서", "전유준", "홍채원",
-  "배현우", "노지안", "문서준", "양다인",
+// 학년별 테스트 반 1개씩, 반마다 학생 8명. prisma/seed.sql과 같은 데이터다
+// (Supabase SQL Editor에 그대로 붙여넣어 실행할 수 있도록 SQL 버전도 둔다).
+const CLASSES = [
+  {
+    id: "class_g1",
+    name: "1학년 1반 발명반",
+    students: ["김민준", "이서연", "박도윤", "최지우", "정하은", "강시우", "조은우", "윤서아"],
+  },
+  {
+    id: "class_g2",
+    name: "2학년 1반 발명반",
+    students: ["장하윤", "임지호", "한소율", "오준서", "서예은", "신도현", "권나은", "황건우"],
+  },
+  {
+    id: "class_g3",
+    name: "3학년 1반 발명반",
+    students: ["안수아", "송민서", "전유준", "홍채원", "배현우", "노지안", "문서준", "양다인"],
+  },
 ];
 
-const BOARD_TYPES = ["arduino", "microbit"] as const;
-const STAGE_STATUSES = ["not_started", "in_progress", "done"] as const;
-
-function pick<T>(arr: readonly T[], seed: number): T {
-  return arr[seed % arr.length];
-}
+const STAGE_COUNT = 6;
 
 async function main() {
   console.log("Seeding database...");
@@ -26,62 +33,37 @@ async function main() {
   await prisma.class.deleteMany();
 
   const teacher = await prisma.user.create({
-    data: {
-      email: "teacher1@robotedu.test",
-      name: "김선생",
-      role: "teacher",
-    },
+    data: { id: "teacher_1", email: "teacher1@inventedu.test", name: "김선생", role: "teacher" },
   });
 
-  const klass = await prisma.class.create({
-    data: {
-      teacherId: teacher.id,
-      name: "6학년 2반 로봇반",
-    },
-  });
+  let n = 0;
+  for (const c of CLASSES) {
+    await prisma.class.create({ data: { id: c.id, teacherId: teacher.id, name: c.name } });
 
-  await prisma.user.update({
-    where: { id: teacher.id },
-    data: { classId: klass.id },
-  });
-
-  for (let i = 0; i < STUDENT_NAMES.length; i++) {
-    const name = STUDENT_NAMES[i];
-    const boardType = pick(BOARD_TYPES, i);
-
-    const student = await prisma.user.create({
-      data: {
-        email: `student${i + 1}@robotedu.test`,
-        name,
-        role: "student",
-        classId: klass.id,
-        boardType: i % 5 === 0 ? null : boardType, // a few haven't onboarded yet
-      },
-    });
-
-    // Give each student a somewhat realistic, staggered progress pattern.
-    for (let stage = 1; stage <= 4; stage++) {
-      let status: (typeof STAGE_STATUSES)[number] = "not_started";
-      const progressLevel = i % 6; // 0..5, how far this student generally is
-
-      if (stage < progressLevel) status = "done";
-      else if (stage === progressLevel) status = "in_progress";
-
-      await prisma.progress.create({
+    for (const name of c.students) {
+      n++;
+      const student = await prisma.user.create({
         data: {
-          userId: student.id,
-          stage,
-          status,
+          id: `student_${n}`,
+          email: `student${n}@inventedu.test`,
+          name,
+          role: "student",
+          classId: c.id,
         },
       });
+
+      // 학생마다 진행 정도를 다르게 (0~6단계) 해서 교사 화면을 확인하기 쉽게 한다.
+      const level = n % (STAGE_COUNT + 1);
+      for (let stage = 1; stage <= STAGE_COUNT; stage++) {
+        const status = stage < level ? "done" : stage === level ? "in_progress" : "not_started";
+        await prisma.progress.create({
+          data: { id: `progress_${student.id}_${stage}`, userId: student.id, stage, status },
+        });
+      }
     }
   }
 
-  console.log("Seed complete:", {
-    teacher: teacher.email,
-    class: klass.name,
-    students: STUDENT_NAMES.length,
-  });
+  console.log("Seed complete:", { teacher: teacher.email, classes: CLASSES.length, students: n });
 }
 
 main()

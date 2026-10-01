@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
-
-const VALID_STAGES = [1, 2, 3, 4];
+import { STAGE_NUMBERS as VALID_STAGES } from "@/lib/stages";
 const VALID_STATUSES = ["not_started", "in_progress", "done"];
 
-/** Returns the current user's progress for all 4 stages, creating missing rows as "not_started". */
+/** Returns the current user's progress for all stages, creating missing rows as "not_started". */
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) {
@@ -38,7 +37,7 @@ export async function POST(req: NextRequest) {
 
   if (!VALID_STAGES.includes(stage) || !status || !VALID_STATUSES.includes(status)) {
     return NextResponse.json(
-      { error: "stage must be 1-4 and status one of not_started|in_progress|done" },
+      { error: `stage must be ${VALID_STAGES.join("|")} and status one of not_started|in_progress|done` },
       { status: 400 }
     );
   }

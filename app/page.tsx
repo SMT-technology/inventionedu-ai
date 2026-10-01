@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/session";
+import { stageHref } from "@/lib/stages";
 
 export default async function HomePage() {
   const user = await getCurrentUser();
@@ -12,9 +13,5 @@ export default async function HomePage() {
     redirect("/dashboard");
   }
 
-  if (!user.boardType) {
-    redirect("/onboarding");
-  }
-
-  redirect("/stage1-hw");
+  redirect(stageHref(1));
 }
