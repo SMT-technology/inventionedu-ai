@@ -29,8 +29,10 @@ async function main() {
 
   await prisma.submission.deleteMany();
   await prisma.progress.deleteMany();
-  await prisma.user.deleteMany();
+  // User.classId와 Class.teacherId가 서로를 가리키므로 연결을 먼저 끊는다
+  await prisma.user.updateMany({ data: { classId: null } });
   await prisma.class.deleteMany();
+  await prisma.user.deleteMany();
 
   const teacher = await prisma.user.create({
     data: { id: "teacher_1", email: "teacher1@inventedu.test", name: "김선생", role: "teacher" },

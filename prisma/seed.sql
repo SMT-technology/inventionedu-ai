@@ -4,8 +4,10 @@ BEGIN;
 
 DELETE FROM "Submission";
 DELETE FROM "Progress";
-DELETE FROM "User";
+-- User.classId와 Class.teacherId가 서로를 가리키므로 연결을 먼저 끊는다
+UPDATE "User" SET "classId" = NULL;
 DELETE FROM "Class";
+DELETE FROM "User";
 
 INSERT INTO "User" (id, email, name, role) VALUES ('teacher_1', 'teacher1@inventedu.test', '김선생', 'teacher');
 
