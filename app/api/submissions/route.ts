@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
-
-const VALID_STAGES = [1, 2, 3, 4];
+import { STAGE_NUMBERS as VALID_STAGES } from "@/lib/stages";
 
 /**
- * Submission = one idea-board card (stage 1, Tinkering) or one making-journal
- * entry (stage 2, Making) — a user can have many per stage, unlike Progress
- * which is one row per (user, stage).
+ * Submission = one record card a student writes in a stage (발견한 문제, 아이디어,
+ * 제작 기록 등) — a user can have many per stage, unlike Progress which is one
+ * row per (user, stage).
  */
 export async function GET(req: NextRequest) {
   try {
@@ -20,7 +19,7 @@ export async function GET(req: NextRequest) {
     const stage = stageParam ? Number(stageParam) : undefined;
 
     if (stage !== undefined && !VALID_STAGES.includes(stage)) {
-      return NextResponse.json({ error: "stage must be 1-4" }, { status: 400 });
+      return NextResponse.json({ error: `stage must be one of ${VALID_STAGES.join(", ")}` }, { status: 400 });
     }
 
     const submissions = await prisma.submission.findMany({
@@ -49,7 +48,7 @@ export async function POST(req: NextRequest) {
     const imageUrl = typeof body?.imageUrl === "string" && body.imageUrl.trim() ? body.imageUrl.trim() : null;
 
     if (!VALID_STAGES.includes(stage)) {
-      return NextResponse.json({ error: "stage must be 1-4" }, { status: 400 });
+      return NextResponse.json({ error: `stage must be one of ${VALID_STAGES.join(", ")}` }, { status: 400 });
     }
     if (!title || !content) {
       return NextResponse.json({ error: "title과 content는 필수입니다." }, { status: 400 });

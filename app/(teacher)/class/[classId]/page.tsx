@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import LogoutButton from "@/components/LogoutButton";
+import { STAGES } from "@/lib/stages";
 
 const STATUS_LABEL: Record<string, string> = {
   not_started: "미시작",
@@ -62,21 +63,19 @@ export default async function ClassDetailPage({
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50 text-left">
               <th className="px-4 py-3 font-medium">이름</th>
-              <th className="px-4 py-3 font-medium">보드</th>
-              <th className="px-4 py-3 font-medium">Stage 1</th>
-              <th className="px-4 py-3 font-medium">Stage 2</th>
-              <th className="px-4 py-3 font-medium">Stage 3</th>
-              <th className="px-4 py-3 font-medium">Stage 4</th>
+              {STAGES.map((st) => (
+                <th key={st.stage} className="px-4 py-3 font-medium">
+                  {st.stage}. {st.shortTitle}
+                </th>
+              ))}
+              <th className="px-4 py-3 font-medium">보드(5단계)</th>
             </tr>
           </thead>
           <tbody>
             {klass.students.map((s) => (
               <tr key={s.id} className="border-b border-gray-100 last:border-0">
                 <td className="px-4 py-3 font-medium">{s.name}</td>
-                <td className="px-4 py-3 text-gray-500">
-                  {s.boardType ? BOARD_LABEL[s.boardType] ?? s.boardType : "미선택"}
-                </td>
-                {[1, 2, 3, 4].map((stage) => {
+                {STAGES.map(({ stage }) => {
                   const status =
                     s.progress.find((p) => p.stage === stage)?.status ?? "not_started";
                   return (
@@ -89,6 +88,9 @@ export default async function ClassDetailPage({
                     </td>
                   );
                 })}
+                <td className="px-4 py-3 text-gray-500">
+                  {s.boardType ? BOARD_LABEL[s.boardType] ?? s.boardType : "미선택"}
+                </td>
               </tr>
             ))}
           </tbody>

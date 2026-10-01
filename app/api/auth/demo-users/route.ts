@@ -7,8 +7,8 @@ export const dynamic = "force-dynamic";
 /** Lists seeded demo accounts so the dummy login screen can offer real users to pick from. */
 export async function GET() {
   const users = await prisma.user.findMany({
-    orderBy: [{ role: "asc" }, { name: "asc" }],
-    select: { id: true, name: true, email: true, role: true, boardType: true },
+    orderBy: [{ role: "asc" }, { classId: "asc" }, { name: "asc" }],
+    select: { id: true, name: true, email: true, role: true, class: { select: { name: true } } },
   });
 
   const teachers = users.filter((u) => u.role === "teacher");

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 
-/** Persists the student's board choice (arduino | microbit) made on the onboarding screen. */
+/** Persists the student's board choice (arduino | microbit) made on the stage 5 (실행하기) screen. */
 export async function POST(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) {

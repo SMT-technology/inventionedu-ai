@@ -14,7 +14,7 @@ export type Submission = {
 };
 
 /**
- * Data layer for the idea-board (stage 1) / making-journal (stage 2) screens.
+ * Data layer for each stage's record cards (SubmissionBoard).
  * Kept separate from presentation so the UI can be restyled without touching
  * fetch/error/loading logic.
  */
