@@ -19,8 +19,8 @@ export default async function StagePage({ params }: { params: { stage: string } 
   return (
     <StagePageShell stage={meta.stage}>
       {meta.stage === BOARD_STAGE && (
-        <section className="mt-6">
-          <h3 className="mb-3 text-sm font-bold text-slate-700">HW 보드 선택 (필요한 경우)</h3>
+        <section className="mt-8">
+          <h3 className="mb-4 text-lg font-black text-slate-800">HW 보드 선택 (필요한 경우)</h3>
           <BoardSelector profiles={profiles} currentBoardType={user?.boardType ?? null} />
         </section>
       )}

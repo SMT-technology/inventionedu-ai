@@ -49,12 +49,12 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-7 px-4 py-12 sm:px-6">
+    <main className="mx-auto flex min-h-screen max-w-5xl flex-col justify-center gap-8 px-4 py-10 sm:px-6 lg:py-16">
       <div className="text-center">
-        <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-[1.75rem] border-4 border-white bg-gradient-to-br from-sky-400 to-indigo-500 text-4xl shadow-xl shadow-sky-200" aria-hidden="true">💡</div>
-        <span className="inline-flex rounded-full bg-sky-100 px-3 py-1 text-xs font-bold tracking-widest text-sky-700">INVENTION MAKER LAB</span>
-        <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">발명 메이커 랩</h1>
-        <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-500">
+        <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-[1.75rem] border-4 border-white bg-gradient-to-br from-amber-300 via-orange-300 to-sky-400 text-4xl shadow-xl shadow-amber-200/70" aria-hidden="true">💡</div>
+        <span className="inline-flex rounded-full border border-sky-200 bg-white px-4 py-1.5 text-xs font-black tracking-[0.18em] text-sky-700 shadow-sm">INVENTION MAKER LAB</span>
+        <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">발명 메이커 랩</h1>
+        <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-slate-600 sm:text-base">
           지금은 실제 인증 없이, 아래 데모 계정 중 하나를 선택해 로그인합니다.
         </p>
       </div>
@@ -66,16 +66,18 @@ export default function LoginPage() {
       {loading ? (
         <p className="text-center text-sm font-medium text-sky-600">⚙️ 메이커 계정을 불러오는 중...</p>
       ) : (
-        <div className="maker-panel flex flex-col gap-7 rounded-[2rem] p-5 sm:p-8">
-          <section>
-            <h2 className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-700"><span className="text-xl" aria-hidden="true">🧑‍🏫</span> 교사로 로그인</h2>
-            <div className="flex flex-wrap gap-2">
+        <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr]">
+          <section className="maker-panel rounded-[2rem] p-6 sm:p-8">
+            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-100 text-2xl" aria-hidden="true">🧑‍🏫</div>
+            <h2 className="text-xl font-black text-slate-900">교사로 로그인</h2>
+            <p className="mt-1 text-sm text-slate-500">우리 반의 발명 여정을 살펴보세요.</p>
+            <div className="mt-6 flex flex-wrap gap-2">
               {teachers.map((t) => (
                 <button
                   key={t.id}
                   onClick={() => handleLogin(t.id)}
                   disabled={loggingInId !== null}
-                  className="border border-indigo-200 bg-indigo-50 px-5 py-2.5 text-sm font-bold text-indigo-700 shadow-sm hover:border-indigo-300 hover:bg-indigo-100 disabled:opacity-50"
+                  className="w-full border border-indigo-200 bg-indigo-50 px-5 py-3 text-left text-sm font-bold text-indigo-800 shadow-sm hover:border-indigo-300 hover:bg-indigo-100 disabled:opacity-50"
                 >
                   {loggingInId === t.id ? "로그인 중..." : `${t.name} (교사)`}
                 </button>
@@ -83,15 +85,17 @@ export default function LoginPage() {
             </div>
           </section>
 
-          <section>
-            <h2 className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-700"><span className="text-xl" aria-hidden="true">🧑‍🔧</span> 학생으로 로그인</h2>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <section className="maker-panel rounded-[2rem] p-6 sm:p-8">
+            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-2xl" aria-hidden="true">✨</div>
+            <h2 className="text-xl font-black text-slate-900">학생으로 로그인</h2>
+            <p className="mt-1 text-sm text-slate-500">내 아이디어를 펼칠 계정을 선택해요.</p>
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {students.map((s) => (
                 <button
                   key={s.id}
                   onClick={() => handleLogin(s.id)}
                   disabled={loggingInId !== null}
-                  className="group border border-sky-100 bg-white px-4 py-3 text-left text-sm shadow-sm hover:border-sky-300 hover:bg-sky-50 disabled:opacity-50"
+                  className="group border border-sky-100 bg-sky-50/50 px-4 py-4 text-left text-sm shadow-sm hover:border-sky-300 hover:bg-sky-50 disabled:opacity-50"
                 >
                   <div className="font-bold text-slate-800 group-hover:text-sky-700">🙋 {s.name}</div>
                   <div className="mt-1 text-xs text-slate-500">
