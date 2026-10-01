@@ -28,8 +28,8 @@
 ## Git 작업 원칙
 - 같은 파일을 동시에 건드리지 않는 것이 최우선.
 - 다른 쪽(클로드 코드) 커밋이 이미 브랜치에 있으면 강제로 덮어쓰지 말고 merge로 합친다.
-- `claude/robot-edu-app-scaffold-i5lhtn`은 브랜치 보호 규칙이 걸려있어 직접 push가 불가능하다.
-  작업이 끝나면 반드시 **PR을 생성**해서 base를 `claude/robot-edu-app-scaffold-i5lhtn`으로 지정한다
+- `claude/inventionedu-app-scaffold-i5lhtn`은 브랜치 보호 규칙이 걸려있어 직접 push가 불가능하다.
+  작업이 끝나면 반드시 **PR을 생성**해서 base를 `claude/inventionedu-app-scaffold-i5lhtn`으로 지정한다
   (승인 없이도 merge 가능하도록 설정되어 있음).
 - 작업 시작 전에 `app/layout.tsx`, `app/globals.css` 등 공유 파일의 **현재 내용을 먼저 확인**하고,
   이미 들어가 있는 스타일(그라데이션 배경, 버튼 인터랙션 등)을 리셋하지 말고 그 위에 이어서 작업한다.

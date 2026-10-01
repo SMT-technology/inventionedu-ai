@@ -27,6 +27,6 @@
 ## Git 작업 원칙
 - 같은 파일을 동시에 건드리지 않는 것이 최우선. 겹치는 파일이 있으면 push 전에 반드시 확인.
 - 다른 쪽(코덱스) 커밋이 이미 브랜치에 있으면 강제로 덮어쓰지 말고 merge로 합친다.
-- `claude/robot-edu-app-scaffold-i5lhtn`은 브랜치 보호 규칙(PR 필수, 승인 불필요)이 걸려있어 직접 push가 막혀있다.
+- `claude/inventionedu-app-scaffold-i5lhtn`은 브랜치 보호 규칙(PR 필수, 승인 불필요)이 걸려있어 직접 push가 막혀있다.
   작업 흐름: (1) 별도 브랜치(예: `claude/patch-*`)에 커밋 후 push → (2) 이 브랜치를 대상으로 PR 생성 →
   (3) 승인 없이 바로 merge 가능하니 그대로 merge까지 진행한다.
