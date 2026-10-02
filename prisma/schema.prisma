@@ -14,25 +14,37 @@ generator client {
 
 /// role: "teacher" | "student"
 /// boardType: "arduino" | "microbit" | null — 5단계(실행하기)에서만 선택
+/// 개인정보 최소 수집: 학생은 실명 대신 반 번호(number)와 별명(name)만 저장하고 이메일을 받지 않는다.
+/// 학생 로그인 = 반 코드(Class.joinCode) + 번호 + PIN(pinHash), 교사 로그인 = email + passwordHash.
+/// 해시는 bcrypt 형식이라 Supabase SQL Editor의 pgcrypto crypt()로도 만들 수 있다.
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  role      String
-  classId   String?
-  boardType String?
-  createdAt DateTime @default(now())
+  id           String    @id @default(cuid())
+  email        String?   @unique
+  name         String
+  number       Int?
+  role         String
+  classId      String?
+  boardType    String?
+  pinHash      String?
+  passwordHash String?
+  failedLogins Int       @default(0)
+  lockedUntil  DateTime?
+  createdAt    DateTime  @default(now())
 
-  class       Class?       @relation(fields: [classId], references: [id])
-  progress    Progress[]
-  submissions Submission[]
-  taughtClasses Class[]    @relation("ClassTeacher")
+  class         Class?        @relation(fields: [classId], references: [id])
+  progress      Progress[]
+  submissions   Submission[]
+  chatMessages  ChatMessage[]
+  taughtClasses Class[]       @relation("ClassTeacher")
+
+  @@unique([classId, number])
 }
 
 model Class {
   id        String   @id @default(cuid())
   teacherId String
   name      String
+  joinCode  String?  @unique
   createdAt DateTime @default(now())
 
   teacher  User   @relation("ClassTeacher", fields: [teacherId], references: [id])
@@ -66,4 +78,20 @@ model Submission {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
+}
+
+/// AI 도우미와 나눈 대화 한 줄. 학생 본인과 담당 교사(연구자)만 읽는다.
+/// role: "student" | "assistant"
+/// 보관 기간은 IRB 승인 내용을 따르며, 앱이 자동으로 지우지 않는다.
+model ChatMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  stage     Int
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, stage, createdAt])
 }
