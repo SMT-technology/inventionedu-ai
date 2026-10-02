@@ -1,188 +1,76 @@
--- 발명 메이커 랩 테스트 데이터 (prisma/seed.ts와 같은 내용)
--- Supabase 대시보드 > SQL Editor에 전체를 붙여넣고 Run. 기존 데이터는 모두 지워진다.
-BEGIN;
+-- 발명 메이커 랩 테스트 데이터 (prisma/seed.ts와 같은 구성)
+-- 사용법: 아래 "여기를 바꾸세요" 두 줄에 교사 이메일과 비밀번호(10자 이상)를 넣고,
+-- Supabase 대시보드 > SQL Editor에 전체를 붙여넣어 Run.
+-- 기존 데이터는 모두 지워진다. 마지막 결과 표에 반 코드와 학생 PIN이 한 번만 나오니 따로 보관하세요.
+-- 비밀번호와 PIN은 bcrypt 해시(pgcrypto)로만 저장된다.
 
-DELETE FROM "Submission";
-DELETE FROM "Progress";
--- User.classId와 Class.teacherId가 서로를 가리키므로 연결을 먼저 끊는다
-UPDATE "User" SET "classId" = NULL;
-DELETE FROM "Class";
-DELETE FROM "User";
+CREATE SCHEMA IF NOT EXISTS extensions;
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
 
-INSERT INTO "User" (id, email, name, role) VALUES ('teacher_1', 'teacher1@inventedu.test', '김선생', 'teacher');
+DROP TABLE IF EXISTS pg_temp.seed_issued;
+CREATE TEMP TABLE seed_issued (class_name TEXT, join_code TEXT, number INT, nickname TEXT, pin TEXT);
 
-INSERT INTO "Class" (id, "teacherId", name) VALUES ('class_g1', 'teacher_1', '1학년 1반 발명반');
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_1', 'student1@inventedu.test', '김민준', 'student', 'class_g1');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_1_1', 'student_1', 1, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_1_2', 'student_1', 2, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_1_3', 'student_1', 3, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_1_4', 'student_1', 4, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_1_5', 'student_1', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_1_6', 'student_1', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_2', 'student2@inventedu.test', '이서연', 'student', 'class_g1');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_2_1', 'student_2', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_2_2', 'student_2', 2, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_2_3', 'student_2', 3, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_2_4', 'student_2', 4, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_2_5', 'student_2', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_2_6', 'student_2', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_3', 'student3@inventedu.test', '박도윤', 'student', 'class_g1');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_3_1', 'student_3', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_3_2', 'student_3', 2, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_3_3', 'student_3', 3, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_3_4', 'student_3', 4, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_3_5', 'student_3', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_3_6', 'student_3', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_4', 'student4@inventedu.test', '최지우', 'student', 'class_g1');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_4_1', 'student_4', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_4_2', 'student_4', 2, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_4_3', 'student_4', 3, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_4_4', 'student_4', 4, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_4_5', 'student_4', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_4_6', 'student_4', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_5', 'student5@inventedu.test', '정하은', 'student', 'class_g1');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_5_1', 'student_5', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_5_2', 'student_5', 2, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_5_3', 'student_5', 3, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_5_4', 'student_5', 4, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_5_5', 'student_5', 5, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_5_6', 'student_5', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_6', 'student6@inventedu.test', '강시우', 'student', 'class_g1');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_6_1', 'student_6', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_6_2', 'student_6', 2, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_6_3', 'student_6', 3, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_6_4', 'student_6', 4, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_6_5', 'student_6', 5, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_6_6', 'student_6', 6, 'in_progress', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_7', 'student7@inventedu.test', '조은우', 'student', 'class_g1');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_7_1', 'student_7', 1, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_7_2', 'student_7', 2, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_7_3', 'student_7', 3, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_7_4', 'student_7', 4, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_7_5', 'student_7', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_7_6', 'student_7', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_8', 'student8@inventedu.test', '윤서아', 'student', 'class_g1');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_8_1', 'student_8', 1, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_8_2', 'student_8', 2, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_8_3', 'student_8', 3, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_8_4', 'student_8', 4, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_8_5', 'student_8', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_8_6', 'student_8', 6, 'not_started', NOW());
+DO $$
+DECLARE
+  teacher_email    TEXT := 'teacher1@inventedu.test';   -- 여기를 바꾸세요
+  teacher_password TEXT := 'CHANGE_ME_PASSWORD';        -- 여기를 바꾸세요
+  classes TEXT[][] := ARRAY[
+    ARRAY['class_g1', '1학년 1반 발명반'],
+    ARRAY['class_g2', '2학년 1반 발명반'],
+    ARRAY['class_g3', '3학년 1반 발명반']
+  ];
+  nicknames TEXT[] := ARRAY[
+    '번개','햇살','바람','구름','별빛','파도','새싹','무지개',
+    '달빛','노을','이슬','단풍','솔방울','다람쥐','고래','펭귄',
+    '부엉이','여우','수달','해바라기','민들레','토끼','거북','반딧불'
+  ];
+  code_chars TEXT := 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  c INT; i INT; s INT; n INT := 0; lvl INT;
+  code TEXT; student_pin TEXT; sid TEXT;
+BEGIN
+  IF teacher_password = 'CHANGE_ME_PASSWORD' OR length(teacher_password) < 10 THEN
+    RAISE EXCEPTION '교사 비밀번호(10자 이상)를 먼저 바꾸고 실행하세요.';
+  END IF;
 
-INSERT INTO "Class" (id, "teacherId", name) VALUES ('class_g2', 'teacher_1', '2학년 1반 발명반');
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_9', 'student9@inventedu.test', '장하윤', 'student', 'class_g2');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_9_1', 'student_9', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_9_2', 'student_9', 2, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_9_3', 'student_9', 3, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_9_4', 'student_9', 4, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_9_5', 'student_9', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_9_6', 'student_9', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_10', 'student10@inventedu.test', '임지호', 'student', 'class_g2');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_10_1', 'student_10', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_10_2', 'student_10', 2, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_10_3', 'student_10', 3, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_10_4', 'student_10', 4, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_10_5', 'student_10', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_10_6', 'student_10', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_11', 'student11@inventedu.test', '한소율', 'student', 'class_g2');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_11_1', 'student_11', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_11_2', 'student_11', 2, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_11_3', 'student_11', 3, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_11_4', 'student_11', 4, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_11_5', 'student_11', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_11_6', 'student_11', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_12', 'student12@inventedu.test', '오준서', 'student', 'class_g2');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_12_1', 'student_12', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_12_2', 'student_12', 2, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_12_3', 'student_12', 3, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_12_4', 'student_12', 4, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_12_5', 'student_12', 5, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_12_6', 'student_12', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_13', 'student13@inventedu.test', '서예은', 'student', 'class_g2');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_13_1', 'student_13', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_13_2', 'student_13', 2, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_13_3', 'student_13', 3, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_13_4', 'student_13', 4, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_13_5', 'student_13', 5, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_13_6', 'student_13', 6, 'in_progress', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_14', 'student14@inventedu.test', '신도현', 'student', 'class_g2');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_14_1', 'student_14', 1, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_14_2', 'student_14', 2, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_14_3', 'student_14', 3, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_14_4', 'student_14', 4, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_14_5', 'student_14', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_14_6', 'student_14', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_15', 'student15@inventedu.test', '권나은', 'student', 'class_g2');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_15_1', 'student_15', 1, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_15_2', 'student_15', 2, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_15_3', 'student_15', 3, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_15_4', 'student_15', 4, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_15_5', 'student_15', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_15_6', 'student_15', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_16', 'student16@inventedu.test', '황건우', 'student', 'class_g2');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_16_1', 'student_16', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_16_2', 'student_16', 2, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_16_3', 'student_16', 3, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_16_4', 'student_16', 4, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_16_5', 'student_16', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_16_6', 'student_16', 6, 'not_started', NOW());
+  DELETE FROM "ChatMessage";
+  DELETE FROM "Submission";
+  DELETE FROM "Progress";
+  -- User.classId와 Class.teacherId가 서로를 가리키므로 연결을 먼저 끊는다
+  UPDATE "User" SET "classId" = NULL;
+  DELETE FROM "Class";
+  DELETE FROM "User";
 
-INSERT INTO "Class" (id, "teacherId", name) VALUES ('class_g3', 'teacher_1', '3학년 1반 발명반');
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_17', 'student17@inventedu.test', '안수아', 'student', 'class_g3');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_17_1', 'student_17', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_17_2', 'student_17', 2, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_17_3', 'student_17', 3, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_17_4', 'student_17', 4, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_17_5', 'student_17', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_17_6', 'student_17', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_18', 'student18@inventedu.test', '송민서', 'student', 'class_g3');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_18_1', 'student_18', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_18_2', 'student_18', 2, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_18_3', 'student_18', 3, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_18_4', 'student_18', 4, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_18_5', 'student_18', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_18_6', 'student_18', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_19', 'student19@inventedu.test', '전유준', 'student', 'class_g3');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_19_1', 'student_19', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_19_2', 'student_19', 2, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_19_3', 'student_19', 3, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_19_4', 'student_19', 4, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_19_5', 'student_19', 5, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_19_6', 'student_19', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_20', 'student20@inventedu.test', '홍채원', 'student', 'class_g3');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_20_1', 'student_20', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_20_2', 'student_20', 2, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_20_3', 'student_20', 3, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_20_4', 'student_20', 4, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_20_5', 'student_20', 5, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_20_6', 'student_20', 6, 'in_progress', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_21', 'student21@inventedu.test', '배현우', 'student', 'class_g3');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_21_1', 'student_21', 1, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_21_2', 'student_21', 2, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_21_3', 'student_21', 3, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_21_4', 'student_21', 4, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_21_5', 'student_21', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_21_6', 'student_21', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_22', 'student22@inventedu.test', '노지안', 'student', 'class_g3');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_22_1', 'student_22', 1, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_22_2', 'student_22', 2, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_22_3', 'student_22', 3, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_22_4', 'student_22', 4, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_22_5', 'student_22', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_22_6', 'student_22', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_23', 'student23@inventedu.test', '문서준', 'student', 'class_g3');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_23_1', 'student_23', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_23_2', 'student_23', 2, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_23_3', 'student_23', 3, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_23_4', 'student_23', 4, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_23_5', 'student_23', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_23_6', 'student_23', 6, 'not_started', NOW());
-INSERT INTO "User" (id, email, name, role, "classId") VALUES ('student_24', 'student24@inventedu.test', '양다인', 'student', 'class_g3');
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_24_1', 'student_24', 1, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_24_2', 'student_24', 2, 'done', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_24_3', 'student_24', 3, 'in_progress', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_24_4', 'student_24', 4, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_24_5', 'student_24', 5, 'not_started', NOW());
-INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt") VALUES ('progress_student_24_6', 'student_24', 6, 'not_started', NOW());
+  INSERT INTO "User" (id, email, name, role, "passwordHash")
+  VALUES ('teacher_1', lower(teacher_email), '담당 교사', 'teacher',
+          extensions.crypt(teacher_password, extensions.gen_salt('bf', 10)));
 
-COMMIT;
+  FOR c IN 1..3 LOOP
+    code := '';
+    FOR i IN 1..6 LOOP
+      code := code || substr(code_chars, 1 + floor(random() * length(code_chars))::INT, 1);
+    END LOOP;
+    INSERT INTO "Class" (id, "teacherId", name, "joinCode")
+    VALUES (classes[c][1], 'teacher_1', classes[c][2], code);
+
+    FOR i IN 1..8 LOOP
+      n := n + 1;
+      sid := 'student_' || n;
+      student_pin := lpad(floor(random() * 1000000)::INT::TEXT, 6, '0');
+      INSERT INTO "User" (id, name, number, role, "classId", "pinHash")
+      VALUES (sid, nicknames[n], i, 'student', classes[c][1],
+              extensions.crypt(student_pin, extensions.gen_salt('bf', 10)));
+      INSERT INTO seed_issued VALUES (classes[c][2], code, i, nicknames[n], student_pin);
+
+      -- 학생마다 진행 정도를 다르게 (0~6단계)
+      lvl := n % 7;
+      FOR s IN 1..6 LOOP
+        INSERT INTO "Progress" (id, "userId", stage, status, "updatedAt")
+        VALUES ('progress_' || sid || '_' || s, sid, s,
+                CASE WHEN s < lvl THEN 'done' WHEN s = lvl THEN 'in_progress' ELSE 'not_started' END,
+                NOW());
+      END LOOP;
+    END LOOP;
+  END LOOP;
+END $$;
+
+SELECT * FROM seed_issued ORDER BY class_name, number;
