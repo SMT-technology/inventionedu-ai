@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { prisma } from "@/lib/db";
+import { maskPersonalInfo } from "@/lib/privacy";
 import { getCurrentUser } from "@/lib/session";
 import { getBoardProfileByType } from "@/lib/boardContext";
 import { BOARD_STAGE, isValidStage } from "@/lib/stages";
@@ -27,7 +28,8 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => null);
   const stage = Number(body?.stage);
-  const message = typeof body?.message === "string" ? body.message.trim() : "";
+  // 전화번호·이메일 등은 AI 회사로 보내기 전, 저장하기 전에 가린다.
+  const message = typeof body?.message === "string" ? maskPersonalInfo(body.message.trim()) : "";
 
   if (!isValidStage(stage) || !message) {
     return NextResponse.json(
