@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { LOCK_MINUTES, verifyAndTrack } from "@/lib/auth";
-import { SESSION_COOKIE_NAME, SESSION_MAX_AGE_SECONDS, createSessionToken } from "@/lib/session";
+import { SESSION_COOKIE_NAME, createSessionToken, sessionMaxAgeFor } from "@/lib/session";
 
 /**
  * 로그인.
@@ -56,7 +56,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "입력한 정보가 맞지 않아요." }, { status: 401 });
   }
 
-  const token = createSessionToken(user.id);
+  const maxAge = sessionMaxAgeFor(user.role);
+  const token = createSessionToken(user.id, maxAge);
   if (!token) {
     console.error("SESSION_SECRET is not set (32자 이상 필요)");
     return NextResponse.json({ error: "서버 설정이 끝나지 않아 로그인할 수 없어요." }, { status: 500 });
@@ -68,7 +69,7 @@ export async function POST(req: NextRequest) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: SESSION_MAX_AGE_SECONDS,
+    maxAge,
   });
   return res;
 }

@@ -8,7 +8,13 @@ import { prisma } from "@/lib/db";
  * role/classId/boardType은 매번 DB에서 새로 읽어 쿠키가 낡을 일이 없다.
  */
 export const SESSION_COOKIE_NAME = "iml_session";
-export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
+// 학생은 공용 태블릿을 쓸 수 있어 7일, 교사(연구자)는 매번 로그인하지 않도록 90일
+export const STUDENT_SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
+export const TEACHER_SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 90;
+
+export function sessionMaxAgeFor(role: string) {
+  return role === "teacher" ? TEACHER_SESSION_MAX_AGE_SECONDS : STUDENT_SESSION_MAX_AGE_SECONDS;
+}
 
 function getSecret(): string | null {
   const secret = process.env.SESSION_SECRET;
@@ -23,10 +29,10 @@ function sign(payload: string, secret: string) {
 }
 
 /** 로그인 성공 시 쿠키에 넣을 값을 만든다. SESSION_SECRET이 없으면 null. */
-export function createSessionToken(userId: string): string | null {
+export function createSessionToken(userId: string, maxAgeSeconds: number): string | null {
   const secret = getSecret();
   if (!secret) return null;
-  const expiresAt = Math.floor(Date.now() / 1000) + SESSION_MAX_AGE_SECONDS;
+  const expiresAt = Math.floor(Date.now() / 1000) + maxAgeSeconds;
   const payload = `${userId}.${expiresAt}`;
   return `${payload}.${sign(payload, secret)}`;
 }
