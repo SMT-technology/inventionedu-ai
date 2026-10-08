@@ -3,6 +3,8 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import LogoutButton from "@/components/LogoutButton";
+import StudentPinButton from "@/components/StudentPinButton";
+import DeleteClassChatsButton from "@/components/DeleteClassChatsButton";
 import { STAGES } from "@/lib/stages";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -36,7 +38,7 @@ export default async function ClassDetailPage({
     include: {
       students: {
         include: { progress: true },
-        orderBy: { name: "asc" },
+        orderBy: [{ number: "asc" }, { name: "asc" }],
       },
     },
   });
@@ -54,6 +56,15 @@ export default async function ClassDetailPage({
           </Link>
           <h1 className="mt-4 text-2xl font-black text-slate-900 sm:text-3xl">{klass.name}</h1>
           <p className="mt-1 text-sm font-medium text-slate-600">학생 {klass.students.length}명</p>
+          <p className="mt-1 text-sm text-slate-600">
+            반 코드: <span className="font-mono font-bold">{klass.joinCode ?? "없음"}</span>
+          </p>
+          <p className="mt-2 flex flex-wrap gap-4 text-sm">
+            <a href={`/api/teacher/export?classId=${klass.id}`} className="font-bold text-sky-700 underline">
+              대화 가명 내보내기(CSV)
+            </a>
+            <DeleteClassChatsButton classId={klass.id} name={klass.name} />
+          </p>
         </div>
         <LogoutButton />
       </div>
@@ -62,19 +73,20 @@ export default async function ClassDetailPage({
         <table className="w-full min-w-[800px] text-sm">
           <thead>
             <tr className="border-b border-sky-100 bg-sky-50/80 text-left text-slate-700">
-              <th scope="col" className="sticky left-0 bg-sky-50 px-5 py-4 font-bold">이름</th>
+              <th scope="col" className="sticky left-0 bg-sky-50 px-5 py-4 font-bold">번호·별명</th>
               {STAGES.map((st) => (
                 <th key={st.stage} scope="col" className="px-4 py-4 font-bold">
                   {st.stage}. {st.shortTitle}
                 </th>
               ))}
               <th scope="col" className="px-4 py-4 font-bold">보드(5단계)</th>
+              <th scope="col" className="px-4 py-4 font-bold">관리</th>
             </tr>
           </thead>
           <tbody>
             {klass.students.map((s) => (
               <tr key={s.id} className="border-b border-sky-50 bg-white hover:bg-sky-50/40 last:border-0">
-                <td className="sticky left-0 bg-inherit px-5 py-4 font-bold text-slate-800">{s.name}</td>
+                <td className="sticky left-0 bg-inherit px-5 py-4 font-bold text-slate-800">{s.number != null ? `${s.number}번 ` : ""}{s.name}</td>
                 {STAGES.map(({ stage }) => {
                   const status =
                     s.progress.find((p) => p.stage === stage)?.status ?? "not_started";
@@ -90,6 +102,14 @@ export default async function ClassDetailPage({
                 })}
                 <td className="px-4 py-4 text-slate-600">
                   {s.boardType ? BOARD_LABEL[s.boardType] ?? s.boardType : "미선택"}
+                </td>
+                <td className="px-4 py-4">
+                  <div className="flex flex-col gap-1">
+                    <Link href={`/class/${klass.id}/student/${s.id}`} className="text-sm font-bold text-sky-700 underline">
+                      대화 보기
+                    </Link>
+                    <StudentPinButton studentId={s.id} />
+                  </div>
                 </td>
               </tr>
             ))}
