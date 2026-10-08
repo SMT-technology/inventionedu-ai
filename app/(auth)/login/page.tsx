@@ -63,6 +63,12 @@ export default function LoginPage() {
         <p className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">⚠️ {error}</p>
       )}
 
+      {!loading && !error && teachers.length === 0 && students.length === 0 && (
+        <p className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
+          아직 테스트 계정이 없어요. Supabase SQL Editor에서 prisma/seed.sql을 실행하면 아래에 계정 버튼이 생겨요.
+        </p>
+      )}
+
       {loading ? (
         <p className="text-center text-sm font-medium text-sky-600">⚙️ 메이커 계정을 불러오는 중...</p>
       ) : (
