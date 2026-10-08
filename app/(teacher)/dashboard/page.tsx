@@ -12,7 +12,7 @@ export default async function TeacherDashboardPage() {
   const classes = await prisma.class.findMany({
     where: { teacherId: user.id },
     orderBy: { createdAt: "asc" },
-    include: { students: true },
+    include: { students: true, teams: true },
   });
 
   return (
@@ -21,11 +21,19 @@ export default async function TeacherDashboardPage() {
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-300 to-sky-400 text-3xl shadow-lg shadow-amber-100" aria-hidden="true">🧑‍🏫</div>
           <div>
-          <p className="section-kicker">발명 메이커 랩 · 교사</p>
+          <p className="section-kicker">로봇 관절 도우미 · 교사</p>
           <h1 className="mt-1 text-2xl font-black text-slate-900 sm:text-3xl">{user.name}님의 대시보드</h1>
           </div>
         </div>
-        <LogoutButton />
+        <div className="flex flex-wrap gap-2">
+          <Link href="/learn" className="rounded-2xl bg-sky-600 px-4 py-2.5 text-sm font-bold text-white">
+            학생 페이지 미리보기
+          </Link>
+          <Link href="/settings" className="border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600">
+            수업 설정
+          </Link>
+          <LogoutButton />
+        </div>
       </div>
 
       {classes.length === 0 ? (
@@ -46,7 +54,7 @@ export default async function TeacherDashboardPage() {
                   반 상세 보기 →
                 </Link>
               </div>
-              <p className="text-sm font-medium text-slate-600">학생 수: {c.students.length}명</p>
+              <p className="text-sm font-medium text-slate-600">학생 {c.students.length}명 · {c.teams.length}모둠</p>
             </div>
           ))}
         </div>

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import LogoutButton from "@/components/LogoutButton";
-import { STAGES } from "@/lib/stages";
+import { STEPS } from "@/lib/steps";
 
 const STATUS_LABEL: Record<string, string> = {
   not_started: "미시작",
@@ -15,11 +15,6 @@ const STATUS_STYLE: Record<string, string> = {
   not_started: "bg-slate-100 text-slate-600",
   in_progress: "bg-amber-100 text-amber-900",
   done: "bg-emerald-100 text-emerald-800",
-};
-
-const BOARD_LABEL: Record<string, string> = {
-  arduino: "아두이노 우노",
-  microbit: "마이크로비트",
 };
 
 export default async function ClassDetailPage({
@@ -35,8 +30,8 @@ export default async function ClassDetailPage({
     where: { id: params.classId },
     include: {
       students: {
-        include: { progress: true },
-        orderBy: { name: "asc" },
+        include: { progress: true, team: true },
+        orderBy: [{ teamId: "asc" }, { name: "asc" }],
       },
     },
   });
@@ -63,23 +58,24 @@ export default async function ClassDetailPage({
           <thead>
             <tr className="border-b border-sky-100 bg-sky-50/80 text-left text-slate-700">
               <th scope="col" className="sticky left-0 bg-sky-50 px-5 py-4 font-bold">이름</th>
-              {STAGES.map((st) => (
-                <th key={st.stage} scope="col" className="px-4 py-4 font-bold">
-                  {st.stage}. {st.shortTitle}
+              <th scope="col" className="px-4 py-4 font-bold">모둠</th>
+              {STEPS.map((st) => (
+                <th key={st.step} scope="col" className="px-4 py-4 font-bold">
+                  {st.step}. {st.title}
                 </th>
               ))}
-              <th scope="col" className="px-4 py-4 font-bold">보드(5단계)</th>
             </tr>
           </thead>
           <tbody>
             {klass.students.map((s) => (
               <tr key={s.id} className="border-b border-sky-50 bg-white hover:bg-sky-50/40 last:border-0">
                 <td className="sticky left-0 bg-inherit px-5 py-4 font-bold text-slate-800">{s.name}</td>
-                {STAGES.map(({ stage }) => {
+                <td className="px-4 py-4 text-slate-600">{s.team?.name ?? "미배정"}</td>
+                {STEPS.map(({ step }) => {
                   const status =
-                    s.progress.find((p) => p.stage === stage)?.status ?? "not_started";
+                    s.progress.find((p) => p.step === step)?.status ?? "not_started";
                   return (
-                    <td key={stage} className="px-4 py-4">
+                    <td key={step} className="px-4 py-4">
                       <span
                         className={`inline-block whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold ${STATUS_STYLE[status]}`}
                       >
@@ -88,9 +84,6 @@ export default async function ClassDetailPage({
                     </td>
                   );
                 })}
-                <td className="px-4 py-4 text-slate-600">
-                  {s.boardType ? BOARD_LABEL[s.boardType] ?? s.boardType : "미선택"}
-                </td>
               </tr>
             ))}
           </tbody>

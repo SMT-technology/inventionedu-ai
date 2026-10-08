@@ -18,11 +18,11 @@ const STYLE: Record<Status, string> = {
   done: "border border-emerald-200 bg-emerald-100 text-emerald-900",
 };
 
-export default function StageToggle({
-  stage,
+export default function StepToggle({
+  step,
   initialStatus,
 }: {
-  stage: number;
+  step: number;
   initialStatus: string;
 }) {
   const router = useRouter();
@@ -37,7 +37,7 @@ export default function StageToggle({
       await fetch("/api/progress", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ stage, status: next }),
+        body: JSON.stringify({ step, status: next }),
       });
       router.refresh();
     } finally {
