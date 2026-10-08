@@ -51,9 +51,9 @@ export default function LoginPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-5xl flex-col justify-center gap-8 px-4 py-10 sm:px-6 lg:py-16">
       <div className="text-center">
-        <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-[1.75rem] border-4 border-white bg-gradient-to-br from-amber-300 via-orange-300 to-sky-400 text-4xl shadow-xl shadow-amber-200/70" aria-hidden="true">💡</div>
-        <span className="inline-flex rounded-full border border-sky-200 bg-white px-4 py-1.5 text-xs font-black tracking-[0.18em] text-sky-700 shadow-sm">INVENTION MAKER LAB</span>
-        <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">발명 메이커 랩</h1>
+        <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-[1.75rem] border-4 border-white bg-gradient-to-br from-amber-300 via-orange-300 to-sky-400 text-4xl shadow-xl shadow-amber-200/70" aria-hidden="true">🦾</div>
+        <span className="inline-flex rounded-full border border-sky-200 bg-white px-4 py-1.5 text-xs font-black tracking-[0.18em] text-sky-700 shadow-sm">ROBOT JOINT HELPER</span>
+        <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">로봇 관절 도우미</h1>
         <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-slate-600 sm:text-base">
           지금은 실제 인증 없이, 아래 데모 계정 중 하나를 선택해 로그인합니다.
         </p>
@@ -63,6 +63,12 @@ export default function LoginPage() {
         <p className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">⚠️ {error}</p>
       )}
 
+      {!loading && !error && teachers.length === 0 && students.length === 0 && (
+        <p className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
+          아직 테스트 계정이 없어요. Supabase SQL Editor에서 prisma/seed.sql을 실행하면 아래에 계정 버튼이 생겨요.
+        </p>
+      )}
+
       {loading ? (
         <p className="text-center text-sm font-medium text-sky-600">⚙️ 메이커 계정을 불러오는 중...</p>
       ) : (
@@ -70,7 +76,7 @@ export default function LoginPage() {
           <section className="maker-panel rounded-[2rem] p-6 sm:p-8">
             <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-100 text-2xl" aria-hidden="true">🧑‍🏫</div>
             <h2 className="text-xl font-black text-slate-900">교사로 로그인</h2>
-            <p className="mt-1 text-sm text-slate-500">우리 반의 발명 여정을 살펴보세요.</p>
+            <p className="mt-1 text-sm text-slate-500">우리 반 로봇팔 프로젝트를 살펴보고 설정해요.</p>
             <div className="mt-6 flex flex-wrap gap-2">
               {teachers.map((t) => (
                 <button
@@ -88,7 +94,7 @@ export default function LoginPage() {
           <section className="maker-panel rounded-[2rem] p-6 sm:p-8">
             <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-2xl" aria-hidden="true">✨</div>
             <h2 className="text-xl font-black text-slate-900">학생으로 로그인</h2>
-            <p className="mt-1 text-sm text-slate-500">내 아이디어를 펼칠 계정을 선택해요.</p>
+            <p className="mt-1 text-sm text-slate-500">내 계정을 골라 로봇팔 프로젝트를 시작해요.</p>
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {students.map((s) => (
                 <button

@@ -1,71 +1,47 @@
 import { PrismaClient } from "@prisma/client";
+import { STEP_NUMBERS } from "../lib/steps";
 
 const prisma = new PrismaClient();
 
-// 학년별 테스트 반 1개씩, 반마다 학생 8명. prisma/seed.sql과 같은 데이터다
+// 테스트 반 1개, 학생 8명(2인 1조 4팀). prisma/seed.sql과 같은 데이터다
 // (Supabase SQL Editor에 그대로 붙여넣어 실행할 수 있도록 SQL 버전도 둔다).
-const CLASSES = [
-  {
-    id: "class_g1",
-    name: "1학년 1반 발명반",
-    students: ["김민준", "이서연", "박도윤", "최지우", "정하은", "강시우", "조은우", "윤서아"],
-  },
-  {
-    id: "class_g2",
-    name: "2학년 1반 발명반",
-    students: ["장하윤", "임지호", "한소율", "오준서", "서예은", "신도현", "권나은", "황건우"],
-  },
-  {
-    id: "class_g3",
-    name: "3학년 1반 발명반",
-    students: ["안수아", "송민서", "전유준", "홍채원", "배현우", "노지안", "문서준", "양다인"],
-  },
-];
-
-const STAGE_COUNT = 6;
+const CLASS = { id: "class_1", name: "1학년 1반 로봇팔반" };
+const STUDENTS = ["김민준", "이서연", "박도윤", "최지우", "정하은", "강시우", "조은우", "윤서아"];
 
 async function main() {
   console.log("Seeding database...");
 
-  await prisma.submission.deleteMany();
   await prisma.progress.deleteMany();
-  // User.classId와 Class.teacherId가 서로를 가리키므로 연결을 먼저 끊는다
-  await prisma.user.updateMany({ data: { classId: null } });
+  await prisma.user.updateMany({ data: { classId: null, teamId: null } });
+  await prisma.team.deleteMany();
   await prisma.class.deleteMany();
   await prisma.user.deleteMany();
 
-  const teacher = await prisma.user.create({
-    data: { id: "teacher_1", email: "teacher1@inventedu.test", name: "김선생", role: "teacher" },
+  await prisma.user.create({
+    data: { id: "teacher_1", email: "teacher1@robotarm.test", name: "김선생", role: "teacher" },
   });
+  await prisma.class.create({ data: { ...CLASS, teacherId: "teacher_1" } });
 
-  let n = 0;
-  for (const c of CLASSES) {
-    await prisma.class.create({ data: { id: c.id, teacherId: teacher.id, name: c.name } });
-
-    for (const name of c.students) {
-      n++;
-      const student = await prisma.user.create({
-        data: {
-          id: `student_${n}`,
-          email: `student${n}@inventedu.test`,
-          name,
-          role: "student",
-          classId: c.id,
-        },
-      });
-
-      // 학생마다 진행 정도를 다르게 (0~6단계) 해서 교사 화면을 확인하기 쉽게 한다.
-      const level = n % (STAGE_COUNT + 1);
-      for (let stage = 1; stage <= STAGE_COUNT; stage++) {
-        const status = stage < level ? "done" : stage === level ? "in_progress" : "not_started";
-        await prisma.progress.create({
-          data: { id: `progress_${student.id}_${stage}`, userId: student.id, stage, status },
-        });
-      }
-    }
+  for (let t = 0; t < STUDENTS.length / 2; t++) {
+    await prisma.team.create({ data: { id: `team_${t + 1}`, classId: CLASS.id, name: `${t + 1}모둠` } });
   }
 
-  console.log("Seed complete:", { teacher: teacher.email, classes: CLASSES.length, students: n });
+  for (const [i, name] of STUDENTS.entries()) {
+    const n = i + 1;
+    await prisma.user.create({
+      data: {
+        id: `student_${n}`,
+        email: `student${n}@robotarm.test`,
+        name,
+        role: "student",
+        classId: CLASS.id,
+        teamId: `team_${Math.floor(i / 2) + 1}`,
+        progress: { create: STEP_NUMBERS.map((step) => ({ id: `progress_student_${n}_${step}`, step })) },
+      },
+    });
+  }
+
+  console.log(`Seeded 1 teacher, 1 class, ${STUDENTS.length / 2} teams, ${STUDENTS.length} students.`);
 }
 
 main()
@@ -73,6 +49,4 @@ main()
     console.error(e);
     process.exit(1);
   })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .finally(() => prisma.$disconnect());

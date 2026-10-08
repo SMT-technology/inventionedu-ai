@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 
 /**
  * Dummy session handling (no real auth yet).
- * We only store the userId in a plain cookie; role/classId/boardType are
+ * We only store the userId in a plain cookie; role/classId/teamId are
  * always looked up fresh from the DB so the cookie can never go stale.
  */
 export const SESSION_COOKIE_NAME = "redu_uid";

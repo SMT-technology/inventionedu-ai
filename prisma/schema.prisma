@@ -1,6 +1,6 @@
-// Prisma schema for the 발명 메이커 랩 (invention education) app
-// Note: enum-like fields are typed as String (documented via comments below)
-// so the same schema stays portable if the DB provider ever changes again.
+// Prisma schema for 로봇 관절 도우미 (중학교 로봇팔 프로젝트 웹앱)
+// 2026-10-08 초기화: 발명 웹앱 스키마를 비우고 새로 시작. 로그인 보안(PIN 등)은 이후 단계에서 추가.
+// enum-like fields are typed as String (documented via comments below).
 
 datasource db {
   provider  = "postgresql"
@@ -13,19 +13,18 @@ generator client {
 }
 
 /// role: "teacher" | "student"
-/// boardType: "arduino" | "microbit" | null — 5단계(실행하기)에서만 선택
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   name      String
   role      String
   classId   String?
-  boardType String?
+  teamId    String?
   createdAt DateTime @default(now())
 
-  class       Class?       @relation(fields: [classId], references: [id])
-  progress    Progress[]
-  submissions Submission[]
+  class         Class?     @relation(fields: [classId], references: [id])
+  team          Team?      @relation(fields: [teamId], references: [id])
+  progress      Progress[]
   taughtClasses Class[]    @relation("ClassTeacher")
 }
 
@@ -37,33 +36,30 @@ model Class {
 
   teacher  User   @relation("ClassTeacher", fields: [teacherId], references: [id])
   students User[]
+  teams    Team[]
 }
 
-/// stage: 1~6 (발명 문제해결 6단계, lib/stages.ts)
+/// 2인 1조 모둠
+model Team {
+  id        String   @id @default(cuid())
+  classId   String
+  name      String
+  createdAt DateTime @default(now())
+
+  class   Class  @relation(fields: [classId], references: [id])
+  members User[]
+}
+
+/// step: 1~7 (학생 활동 단계, lib/steps.ts)
 /// status: "not_started" | "in_progress" | "done"
 model Progress {
   id        String   @id @default(cuid())
   userId    String
-  stage     Int
+  step      Int
   status    String   @default("not_started")
   updatedAt DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id])
 
-  @@unique([userId, stage])
-}
-
-/// stage: 1~6 (lib/stages.ts)
-/// One row = one record card in a stage (발견한 문제, 아이디어, 제작 기록 등); many per stage.
-model Submission {
-  id        String   @id @default(cuid())
-  userId    String
-  stage     Int
-  title     String
-  content   String
-  imageUrl  String?
-  feedback  String?
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id])
+  @@unique([userId, step])
 }
