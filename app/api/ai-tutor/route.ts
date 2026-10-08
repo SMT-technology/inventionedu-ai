@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { prisma } from "@/lib/db";
 import { maskPersonalInfo } from "@/lib/privacy";
+import { encryptChat, isChatEncryptionReady } from "@/lib/chatCrypto";
 import { getCurrentUser } from "@/lib/session";
 import { getBoardProfileByType } from "@/lib/boardContext";
 import { BOARD_STAGE, isValidStage } from "@/lib/stages";
@@ -73,8 +74,14 @@ export async function POST(req: NextRequest) {
     messages: [{ role: "user", content: message }],
   };
 
+  // 대화는 암호화해서만 저장한다. 키가 없으면 AI에 보내기 전에 멈춘다.
+  if (!isChatEncryptionReady()) {
+    console.error("CHAT_ENCRYPTION_KEY is not set");
+    return NextResponse.json({ error: "서버 설정이 끝나지 않아 대화를 저장할 수 없어요." }, { status: 500 });
+  }
+
   await prisma.chatMessage.create({
-    data: { userId: user.id, stage, role: "student", content: message },
+    data: { userId: user.id, stage, role: "student", content: encryptChat(message) },
   });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -114,7 +121,7 @@ export async function POST(req: NextRequest) {
     : "";
   if (reply) {
     await prisma.chatMessage.create({
-      data: { userId: user.id, stage, role: "assistant", content: reply },
+      data: { userId: user.id, stage, role: "assistant", content: encryptChat(reply) },
     });
   }
 

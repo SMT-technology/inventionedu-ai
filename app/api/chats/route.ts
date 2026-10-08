@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
+import { decryptChat } from "@/lib/chatCrypto";
 import { isValidStage } from "@/lib/stages";
 
 export const dynamic = "force-dynamic";
@@ -24,5 +25,7 @@ export async function GET(req: NextRequest) {
     select: { id: true, stage: true, role: true, content: true, createdAt: true },
   });
 
-  return NextResponse.json({ messages });
+  return NextResponse.json({
+    messages: messages.map((m) => ({ ...m, content: decryptChat(m.content) })),
+  });
 }

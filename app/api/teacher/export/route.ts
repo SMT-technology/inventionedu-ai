@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
 import { findClassOfTeacher } from "@/lib/auth";
+import { decryptChat } from "@/lib/chatCrypto";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +37,7 @@ export async function GET(req: NextRequest) {
 
   const header = ["pseudonym_id", "stage", "role", "content", "created_at"];
   const rows = messages.map((m) =>
-    [`${klass.id}-${m.user.number ?? "x"}`, m.stage, m.role, m.content, m.createdAt.toISOString()]
+    [`${klass.id}-${m.user.number ?? "x"}`, m.stage, m.role, decryptChat(m.content), m.createdAt.toISOString()]
       .map(csvCell)
       .join(",")
   );

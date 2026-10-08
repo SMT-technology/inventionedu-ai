@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { findStudentOfTeacher } from "@/lib/auth";
 import { getStage } from "@/lib/stages";
+import { decryptChat } from "@/lib/chatCrypto";
 
 export const dynamic = "force-dynamic";
 
@@ -44,7 +45,7 @@ export default async function StudentChatsPage({
                 {m.stage}단계 {getStage(m.stage)?.shortTitle ?? ""} · {m.role === "student" ? "학생" : "AI"} ·{" "}
                 {m.createdAt.toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}
               </p>
-              <p className="mt-1 whitespace-pre-wrap text-sm text-slate-800">{m.content}</p>
+              <p className="mt-1 whitespace-pre-wrap text-sm text-slate-800">{decryptChat(m.content)}</p>
             </li>
           ))}
         </ul>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
+import { decryptChat } from "@/lib/chatCrypto";
 import { findClassOfTeacher, findStudentOfTeacher } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -24,7 +25,10 @@ export async function GET(req: NextRequest) {
     select: { id: true, stage: true, role: true, content: true, createdAt: true },
   });
 
-  return NextResponse.json({ student: { id: student.id, number: student.number, name: student.name }, messages });
+  return NextResponse.json({
+    student: { id: student.id, number: student.number, name: student.name },
+    messages: messages.map((m) => ({ ...m, content: decryptChat(m.content) })),
+  });
 }
 
 /**
