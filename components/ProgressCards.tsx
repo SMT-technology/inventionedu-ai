@@ -21,7 +21,7 @@ export default function ProgressCards({
   currentStage?: number;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6" aria-label="6단계 진행 현황">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3" aria-label="단계 진행 현황">
       {STAGES.map((meta) => {
         const status = progress.find((p) => p.stage === meta.stage)?.status ?? "not_started";
         return (

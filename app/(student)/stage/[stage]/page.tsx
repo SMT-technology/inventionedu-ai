@@ -1,36 +1,39 @@
 import { notFound } from "next/navigation";
 import StagePageShell from "@/components/StagePageShell";
 import SubmissionBoard from "@/components/SubmissionBoard";
-import AiHelperPlaceholder from "@/components/AiHelperPlaceholder";
-import BoardSelector from "@/components/BoardSelector";
-import arduinoProfile from "@/board-profiles/arduino-uno.json";
-import microbitProfile from "@/board-profiles/microbit.json";
-import type { BoardProfile } from "@/lib/boardContext";
-import { getCurrentUser } from "@/lib/session";
-import { BOARD_STAGE, getStage } from "@/lib/stages";
+import AiChat from "@/components/AiChat";
+import SensorGrid from "@/components/SensorGrid";
+import SketchCanvas from "@/components/SketchCanvas";
+import PracticeLab from "@/components/PracticeLab";
+import { getStage } from "@/lib/stages";
+import type { PersonaKey } from "@/lib/personas";
 
 export default async function StagePage({ params }: { params: { stage: string } }) {
   const meta = getStage(Number(params.stage));
   if (!meta) notFound();
 
-  const user = await getCurrentUser();
-  const profiles: BoardProfile[] = [arduinoProfile, microbitProfile as unknown as BoardProfile];
-
   return (
     <StagePageShell stage={meta.stage}>
-      {meta.stage === BOARD_STAGE && (
-        <section className="mt-8">
-          <h3 className="mb-4 text-lg font-black text-slate-800">HW 보드 선택 (필요한 경우)</h3>
-          <BoardSelector profiles={profiles} currentBoardType={user?.boardType ?? null} />
-        </section>
+      {meta.stage === 1 ? (
+        <div className="mt-6 flex flex-col gap-6">
+          <SensorGrid />
+          <AiChat persona={meta.persona as PersonaKey} />
+        </div>
+      ) : (
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          {meta.stage === 2 ? <SketchCanvas stage={meta.stage} /> : <PracticeLab />}
+          <AiChat persona={meta.persona as PersonaKey} />
+        </div>
       )}
-      <AiHelperPlaceholder role={meta.aiRole} />
-      <SubmissionBoard
-        stage={meta.stage}
-        entryLabel={meta.entryLabel}
-        titlePlaceholder={meta.titlePlaceholder}
-        contentPlaceholder={meta.contentPlaceholder}
-      />
+
+      <div className="mt-6">
+        <SubmissionBoard
+          stage={meta.stage}
+          entryLabel={meta.entryLabel}
+          titlePlaceholder={meta.titlePlaceholder}
+          contentPlaceholder={meta.contentPlaceholder}
+        />
+      </div>
     </StagePageShell>
   );
 }

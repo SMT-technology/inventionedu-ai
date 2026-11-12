@@ -1,4 +1,4 @@
-// Prisma schema for the 발명 메이커 랩 (invention education) app
+// Prisma schema for the 메이커 튜터 (창의적 전자제품 만들기) app
 // Note: enum-like fields are typed as String (documented via comments below)
 // so the same schema stays portable if the DB provider ever changes again.
 
@@ -13,7 +13,7 @@ generator client {
 }
 
 /// role: "teacher" | "student"
-/// boardType: "arduino" | "microbit" | null — 5단계(실행하기)에서만 선택
+/// boardType: "arduino" | "microbit" | null — 이전 컨셉의 유물, 현재 화면에서는 쓰지 않음
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -23,10 +23,11 @@ model User {
   boardType String?
   createdAt DateTime @default(now())
 
-  class       Class?       @relation(fields: [classId], references: [id])
-  progress    Progress[]
-  submissions Submission[]
-  taughtClasses Class[]    @relation("ClassTeacher")
+  class        Class?        @relation(fields: [classId], references: [id])
+  progress     Progress[]
+  submissions  Submission[]
+  threeDModels ThreeDModel[]
+  taughtClasses Class[]      @relation("ClassTeacher")
 }
 
 model Class {
@@ -39,7 +40,7 @@ model Class {
   students User[]
 }
 
-/// stage: 1~6 (발명 문제해결 6단계, lib/stages.ts)
+/// stage: 1~3 (Maker's Tutor 3단계, lib/stages.ts)
 /// status: "not_started" | "in_progress" | "done"
 model Progress {
   id        String   @id @default(cuid())
@@ -53,8 +54,8 @@ model Progress {
   @@unique([userId, stage])
 }
 
-/// stage: 1~6 (lib/stages.ts)
-/// One row = one record card in a stage (발견한 문제, 아이디어, 제작 기록 등); many per stage.
+/// stage: 1~3 (lib/stages.ts)
+/// One row = one record card in a stage (배운 점, 아이디어 스케치, 실험 기록 등); many per stage.
 model Submission {
   id        String   @id @default(cuid())
   userId    String
@@ -64,6 +65,20 @@ model Submission {
   imageUrl  String?
   feedback  String?
   createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+/// stage 진행(1~3)과는 별개의 독립 기능 — Meshy AI로 아이디어를 3D 모델로 미리 본다.
+/// status: "pending" | "done" | "failed"
+model ThreeDModel {
+  id         String   @id @default(cuid())
+  userId     String
+  prompt     String
+  status     String   @default("pending")
+  resultUrl  String?
+  taskId     String?
+  createdAt  DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
 }
