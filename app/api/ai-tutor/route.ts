@@ -2,93 +2,79 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { getCurrentUser } from "@/lib/session";
-import { getBoardProfileByType } from "@/lib/boardContext";
-import { BOARD_STAGE, isValidStage } from "@/lib/stages";
+import { PERSONAS, isValidPersona } from "@/lib/personas";
 
-const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
-const ANTHROPIC_MODEL = "claude-sonnet-4-5";
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+
+type ChatTurn = { role: "user" | "model"; content: string };
 
 /**
- * AI 튜터 엔드포인트.
- * stage(1-6)에 맞는 시스템 프롬프트를 /lib/stagePrompts/stage{n}.md에서 읽어오고,
- * 5단계(실행하기)에서는 학생의 보드 컨텍스트를 덧붙여 API 요청 본문을 구성한다.
- * 아직 어떤 AI를 쓸지 정하지 않아 화면에서는 호출하지 않는다 (뼈대만 유지).
- * ANTHROPIC_API_KEY가 없으면 실제 호출은 하지 않고 준비된 요청만 반환한다.
+ * AI 챗봇 엔드포인트. persona(friend|sensors|idea|practice)에 맞는 system prompt를
+ * /lib/stagePrompts에서 읽어와 Google Gemini API 요청을 구성한다.
+ * GEMINI_API_KEY가 없으면 실제 호출은 하지 않고 준비된 요청만 반환한다 (뼈대 단계).
  */
 export async function POST(req: NextRequest) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
 
-  const body = await req.json().catch(() => null);
-  const stage = Number(body?.stage);
-  const message = body?.message as string | undefined;
+    const body = await req.json().catch(() => null);
+    const persona = body?.persona;
+    const message = body?.message as string | undefined;
+    const history = Array.isArray(body?.history) ? (body.history as ChatTurn[]) : [];
 
-  if (!isValidStage(stage) || !message) {
-    return NextResponse.json(
-      { error: "stage(1-6)와 message가 필요합니다." },
-      { status: 400 }
-    );
-  }
+    if (!isValidPersona(persona) || !message) {
+      return NextResponse.json(
+        { error: `persona(${Object.keys(PERSONAS).join("|")})와 message가 필요합니다.` },
+        { status: 400 }
+      );
+    }
 
-  const promptPath = path.join(
-    process.cwd(),
-    "lib",
-    "stagePrompts",
-    `stage${stage}.md`
-  );
-  const stageSystemPrompt = await fs.readFile(promptPath, "utf-8");
+    const promptPath = path.join(process.cwd(), "lib", "stagePrompts", PERSONAS[persona].promptFile);
+    const systemPrompt = await fs.readFile(promptPath, "utf-8");
 
-  const boardProfile = stage === BOARD_STAGE ? getBoardProfileByType(user.boardType) : null;
-  const boardContext = boardProfile
-    ? [
-        `현재 학생이 사용 중인 보드: ${boardProfile.displayName}`,
-        `지원 센서: ${boardProfile.supportedSensors.map((s) => s.name).join(", ")}`,
-        `코드 언어: ${boardProfile.codeTemplate.language}`,
-        `통신 방식: ${boardProfile.communication.type} - ${boardProfile.communication.description}`,
-      ].join("\n")
-    : null;
+    const geminiRequestBody = {
+      systemInstruction: { parts: [{ text: systemPrompt }] },
+      contents: [
+        ...history.map((turn) => ({ role: turn.role, parts: [{ text: turn.content }] })),
+        { role: "user", parts: [{ text: message }] },
+      ],
+    };
 
-  const systemPrompt = boardContext
-    ? `${stageSystemPrompt}\n\n## 현재 보드 컨텍스트\n${boardContext}`
-    : stageSystemPrompt;
+    const apiKey = process.env.GEMINI_API_KEY;
 
-  const anthropicRequestBody = {
-    model: ANTHROPIC_MODEL,
-    max_tokens: 1024,
-    system: systemPrompt,
-    messages: [{ role: "user", content: message }],
-  };
+    if (!apiKey) {
+      return NextResponse.json({
+        ok: false,
+        reason: "GEMINI_API_KEY가 설정되지 않았습니다 (.env.local을 확인하세요).",
+        preparedRequest: geminiRequestBody,
+      });
+    }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-
-  if (!apiKey) {
-    return NextResponse.json({
-      ok: false,
-      reason: "ANTHROPIC_API_KEY가 설정되지 않았습니다 (.env.local을 확인하세요).",
-      preparedRequest: anthropicRequestBody,
+    const geminiRes = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(geminiRequestBody),
     });
+
+    if (!geminiRes.ok) {
+      const errText = await geminiRes.text();
+      console.error("Gemini API 오류:", errText);
+      return NextResponse.json(
+        { ok: false, error: `Gemini API 오류: ${errText}` },
+        { status: geminiRes.status }
+      );
+    }
+
+    const data = await geminiRes.json();
+    const reply: string | undefined = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    return NextResponse.json({ ok: true, reply, raw: data });
+  } catch (err) {
+    console.error("POST /api/ai-tutor failed:", err);
+    return NextResponse.json({ ok: false, error: "AI 응답 처리 중 오류가 발생했습니다." }, { status: 500 });
   }
-
-  const anthropicRes = await fetch(ANTHROPIC_API_URL, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify(anthropicRequestBody),
-  });
-
-  if (!anthropicRes.ok) {
-    const errText = await anthropicRes.text();
-    return NextResponse.json(
-      { ok: false, error: `Claude API 오류: ${errText}` },
-      { status: anthropicRes.status }
-    );
-  }
-
-  const data = await anthropicRes.json();
-  return NextResponse.json({ ok: true, data });
 }

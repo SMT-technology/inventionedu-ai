@@ -17,11 +17,6 @@ const STATUS_STYLE: Record<string, string> = {
   done: "bg-emerald-100 text-emerald-800",
 };
 
-const BOARD_LABEL: Record<string, string> = {
-  arduino: "아두이노 우노",
-  microbit: "마이크로비트",
-};
-
 export default async function ClassDetailPage({
   params,
 }: {
@@ -68,7 +63,6 @@ export default async function ClassDetailPage({
                   {st.stage}. {st.shortTitle}
                 </th>
               ))}
-              <th scope="col" className="px-4 py-4 font-bold">보드(5단계)</th>
             </tr>
           </thead>
           <tbody>
@@ -88,9 +82,6 @@ export default async function ClassDetailPage({
                     </td>
                   );
                 })}
-                <td className="px-4 py-4 text-slate-600">
-                  {s.boardType ? BOARD_LABEL[s.boardType] ?? s.boardType : "미선택"}
-                </td>
               </tr>
             ))}
           </tbody>

@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "발명 메이커 랩",
-  description: "중학생 발명 문제해결 6단계를 돕는 웹앱",
+  description: "중학생 창의적 전자제품 만들기를 돕는 웹앱 (센서 학습 · 아이디어 톡 · 미리보기 실험실)",
 };
 
 export default function RootLayout({
